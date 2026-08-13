@@ -1,66 +1,229 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# IT Training Management — Cloud Application
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A cloud-based platform for managing IT training programs, built as a decoupled system: a **Vue.js SPA** on Firebase Hosting consuming a **Laravel REST API** on Google App Engine.
 
-## About Laravel
+Trainees register, apply to training programs, upload materials, and book meetings with advisors. Advisors manage their assigned trainees and approve meeting requests. Managers approve registrations, issue trainee IDs, and oversee the whole system.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+**Live demo:** https://ittrainingsystem.web.app/login
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Contributors
 
-## Learning Laravel
+Academic team project — *Advanced Software Engineering (SDEV 4304)*, Faculty of Information Technology, Islamic University of Gaza.
+Instructor: Dr. Rebhi S. Baraka.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+| Contributor | Area |
+|---|---|
+| **Ahmed Hammad** (this repo) | **Backend API (46 of 49 commits), cloud deployment, database design** |
+| Mohamed Sokar | Frontend (Vue.js SPA) |
+| Zakaria Harara | Frontend, API integration |
+| Mohammed Akram | Mail notifications |
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Demo Accounts
 
-## Laravel Sponsors
+The demo runs in **test mode** — no real payments are processed.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+| Role | Login URL | Credentials |
+|---|---|---|
+| Trainee | `/login/trainee` | ID `7137660` · password `12345678` |
+| Advisor | `/login/supervisor` | `rbaraka@ittraining.com` · `12345678` |
+| Manager | `/login/manager` | `admin@admin.com` · `12345678` |
 
-### Premium Partners
+Stripe test card: `4242 4242 4242 4242`, any future expiry, any 3-digit CVC.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+---
 
-## Contributing
+## Screenshots
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+> _Add 4–5 images to a `docs/` folder and link them here._
 
-## Code of Conduct
+| Login | Programs |
+|---|---|
+| ![Login](docs/login.png) | ![Programs](docs/programs.png) |
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+| Meetings | Payment |
+|---|---|
+| ![Meetings](docs/meetings.png) | ![Payment](docs/payment.png) |
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Architecture
+
+```
+┌─────────────────────────┐         ┌──────────────────────────┐
+│   Vue.js SPA            │  HTTPS  │   Laravel REST API       │
+│   Firebase Hosting      │ ──────► │   Google App Engine      │
+│   Firebase Auth + SDK   │  JSON   │   Sanctum token auth     │
+└─────────────────────────┘         └────────────┬─────────────┘
+                                                 │
+                          ┌──────────────────────┼──────────────────────┐
+                          ▼                      ▼                      ▼
+                 ┌─────────────────┐   ┌──────────────────┐   ┌─────────────────┐
+                 │  Cloud SQL      │   │  Cloud Storage   │   │  Mail service   │
+                 │  (MySQL)        │   │  files & logos   │   │  notifications  │
+                 └─────────────────┘   └──────────────────┘   └─────────────────┘
+```
+
+**Repository layout**
+
+```
+BackendTrainingSystem/     Laravel REST API — deployed to Google App Engine
+frontend-training-system/  Vue.js SPA — deployed to Firebase Hosting
+cors.json                  Cloud Storage CORS configuration
+```
+
+---
+
+## Tech Stack
+
+**Backend** — PHP, Laravel, Laravel Sanctum, Eloquent ORM
+**Frontend** — Vue.js, JavaScript, HTML5, CSS3, Firebase SDK
+**Database** — Cloud SQL (MySQL)
+**Cloud** — Google App Engine, Firebase Hosting, Google Cloud Storage, Firebase Analytics
+**Payments** — Stripe
+**Tools** — Git, Postman, PhpStorm, VS Code
+
+---
+
+## Backend Overview
+
+The API exposes **40+ endpoints** across **13 controllers** and **11 Eloquent models**.
+
+### Authentication
+
+Token-based authentication with **Laravel Sanctum**, using separate login flows per role so each user type authenticates against its own credentials:
+
+```
+POST /api/trainee/login      POST /api/advisor/register
+POST /api/advisor/login      POST /api/manager/register
+POST /api/manager/login      POST /api/logout/{id}
+```
+
+All protected routes are gated server-side with the `auth:sanctum` middleware — direct URL access without a valid token is rejected regardless of what the frontend allows.
+
+### Meeting Scheduling with Conflict Detection
+
+Meeting requests are validated against an advisor's existing bookings before being persisted. The overlap query catches all three collision cases — a new meeting starting inside an existing slot, ending inside one, or fully containing one:
+
+```php
+$conflictingMeetings = Meeting::where('advisor_id', $validatedData['advisor_id'])
+    ->where(function ($query) use ($validatedData) {
+        $query->whereBetween('start_time', [$start, $end])
+            ->orWhereBetween('end_time', [$start, $end])
+            ->orWhere(function ($query) use ($validatedData) {
+                $query->where('start_time', '<=', $start)
+                      ->where('end_time',   '>=', $end);
+            });
+    })
+    ->count();
+
+if ($conflictingMeetings > 0) {
+    return response()->json(
+        ['error' => 'There is a scheduling conflict for the requested meeting'], 409
+    );
+}
+```
+
+On success the meeting is created and a notification is dispatched to the advisor.
+
+### Core Endpoints
+
+| Resource | Endpoints |
+|---|---|
+| Trainees | `apiResource /trainees`, `/trainee/profile`, `/trainees/payment` |
+| Advisors | `apiResource /advisors`, `/advisor/get-meetings/{id}`, `/advisor/acceptMeeting/{id}`, `/advisor/list-trainees` |
+| Managers | `apiResource /managers`, `/manager/accept-trainee/{id}`, `/manager/show-training-requests` |
+| Programs | `apiResource /programs`, `/programs/get-logo/{id}` |
+| Meetings | `/trainees/create-meeting`, `/trainee/list-meetings-requests`, `/manager/list-meetings-requests` |
+| Files | `apiResource /files`, `/trainees/get-files/{id}` |
+| Requests | `/trainee/apply-program`, `/trainees/show-training-requests/{id}` |
+| Attendance | `/trainees/attendance` |
+| Notifications | `apiResource /notifications` |
+
+### Data Model
+
+11 models with foreign-key relationships: `User`, `Trainee`, `Advisor`, `Manager`, `Program`, `Discipline`, `Meeting`, `TrainingRequest`, `TraineeAttendance`, `StoredFile`, `Notification`.
+
+`User` holds authentication and role, with `Trainee` / `Advisor` / `Manager` as role-specific profiles. Advisors are classified by `Discipline`; trainees link to programs through a `program_trainee` pivot table.
+
+---
+
+## Running Locally
+
+**Requirements:** PHP 8.1+, Composer, MySQL 8, Node.js 16+
+
+### Backend
+
+```bash
+cd BackendTrainingSystem
+composer install
+cp .env.example .env
+php artisan key:generate
+```
+
+Set your database credentials in `.env`, then:
+
+```bash
+php artisan migrate
+php artisan serve
+```
+
+API available at `http://localhost:8000/api`.
+
+### Frontend
+
+```bash
+cd frontend-training-system
+npm install
+npm run dev
+```
+
+Point the frontend at your local API base URL before running.
+
+> **Note:** `.env` is git-ignored and contains credentials — never commit it.
+
+---
+
+## Deployment
+
+**Backend → Google App Engine**
+
+```bash
+gcloud app deploy app.yaml
+```
+
+Runtime and resources are declared in `app.yaml`; Cloud SQL is attached as the managed MySQL instance and Cloud Storage handles uploaded files and program logos.
+
+**Frontend → Firebase Hosting**
+
+```bash
+npm run build
+firebase deploy --only hosting
+```
+
+CORS for the storage bucket is configured via `cors.json`.
+
+---
+
+## Features
+
+- Trainee registration with document upload and manager approval workflow
+- Auto-generated unique trainee IDs, emailed on approval
+- Training program browsing, application, and qualification submission
+- Advisor assignment by discipline
+- Meeting requests with server-side conflict resolution
+- File uploads (videos, images, code, documents) reviewable by advisors
+- Attendance forms
+- Email and in-app notifications
+- Stripe payment gateway for account activation
+- Manager dashboard for accounts, requests, and system oversight
+- Firebase Analytics event tracking
+
+---
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Academic project — released for educational and portfolio purposes.
